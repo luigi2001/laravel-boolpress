@@ -71,7 +71,23 @@
                 </div>
             </div>
         </nav>
-
+        @auth
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-link active" aria-current="page" href="#">dashbord</a>
+        <a class="nav-link" href="{{ route('admin.posts.index') }}">posts</a>
+        <a class="nav-link" href="{{ route('admin.posts.create') }}">crea nuovo post</a>
+        <a class="nav-link" href="#">users</a>
+      </div>
+    </div>
+  </div>
+</nav>
+        @endauth
         <main class="py-4">
             @yield('content')
         </main>
