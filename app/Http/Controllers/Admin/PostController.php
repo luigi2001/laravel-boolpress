@@ -38,13 +38,27 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'title' => 'required|max:40',
+            'content' => 'required'
+        ]);
+
         $data = $request->all();
         $newPost = new Post();
-        $newPost->slug = Str::slug($data['title'], '-');
+        $slug = Str::slug($data['title'], '-');
+        $slugI = $slug;
+        $slugp = Post::where('slug', $slug)->first();
+        $count = 1;
+        while($slugp){
+            $slug = $slugI . '-' . $count;
+            $slugp = Post::where('slug', $slug)->first();
+            $count ++;
+        }
+        $newPost->slug = $slug;
         $newPost->fill($data);
         $newPost->save();
 
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('crea','post creato con successo. Id post:' .$newPost->id);
     }
 
     /**
@@ -53,8 +67,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post)
+    public function show($slug)
     {
+        $post = Post::where('slug', $slug)->first();
         return view('admin.posts.show', compact('post'));
     }
 
@@ -78,10 +93,27 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
+        $request->validate([
+            'title' => 'required|max:40',
+            'content' => 'required'
+        ]);
+
         $data = $request->all();
+        if($data['title'] != $post->title){
+            $slug = Str::slug($data['title'], '-');
+            $slugI = $slug;
+            $slugp = Post::where('slug', $slug)->first();
+            $count = 1;
+            while($slugp){
+                $slug = $slugI . '-' . $count;
+                $slugp = Post::where('slug', $slug)->first();
+                $count ++;
+            }
+            $data['slug'] = $slug;
+        }
         $post->update($data);
 
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('modifica','post modificato con successo. Id post:' .$post->id);
     }
 
     /**
@@ -94,6 +126,6 @@ class PostController extends Controller
     {
         $post->delete();
 
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('delete','post eliminato con successo. Id post:' .$post->id);
     }
 }
